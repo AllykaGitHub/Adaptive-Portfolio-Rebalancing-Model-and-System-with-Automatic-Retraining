@@ -1,0 +1,28 @@
+job:
+  time_limit: 300m
+  flavor: 8cpu-128ram
+  generate_name: portfolio-rebalancing-job
+  image: docker-hosted.artifactory.tcsbank.ru/mlcpsando/mlcore-self-service/rebalancing:latest
+  description: "Production portfolio rebalancing pipeline"
+  env:
+    REBALANCING_PROFILE: "2024_2026"
+    REBALANCING_REFRESH_CACHE: "true"
+    REBALANCING_RUN_BACKTEST: "true"
+    REBALANCING_FINAL_STRATEGY: "adaptive_regime_switch"
+    REBALANCING_MAX_WEIGHT: "12"
+    REBALANCING_MAX_POSITIONS: ""
+    REBALANCING_OUTPUT_DIR: "/work/rebalancing_prod_runs"
+  input:
+    - type: files
+      mask: "*.py"
+      src: ./
+      dst: /work
+    - type: files
+      mask: "*.csv"
+      src: ./
+      dst: /work
+  args:
+    - python
+    - /work/run_rebalancing_pipeline.py
+    - --profile
+    - 2024_2026
