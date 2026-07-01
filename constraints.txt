@@ -1,0 +1,9 @@
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.14.1
+scikit-learn==1.5.2
+yfinance==0.2.60
+openpyxl==3.1.5
+requests==2.32.3
+matplotlib==3.8.4
+lxml==5.2.2

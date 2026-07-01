@@ -1,2 +1,6 @@
-# Project exclude paths
-/cmake-build-debug/
+__pycache__/
+*.pyc
+*.pkl
+*.csv
+!sp500_tickers.csv
+rebalancing_prod_runs/

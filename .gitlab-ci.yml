@@ -1,0 +1,62 @@
+include:
+  - project: "ai-platform/public-ci-templates"
+    file: "/templates/.base-docker.yml"
+  - project: "ai-platform/public-ci-templates"
+    file: "/templates/.base-mlc.yml"
+
+stages:
+  - prepare
+  - build
+  - deploy
+
+prepare vars:
+  stage: prepare
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_TAG != null
+      variables:
+        IMAGE_TAG: $CI_COMMIT_TAG
+    - variables:
+        IMAGE_TAG: commit-$CI_COMMIT_SHORT_SHA
+  script:
+    - echo "IMAGE_TAG=$IMAGE_TAG" > env.env
+    - echo "exported envs:" && cat env.env
+  artifacts:
+    reports:
+      dotenv: env.env
+    expire_in: 1 day
+
+build custom image:
+  extends: .mlc_airflow_build_custom_image
+  stage: build
+  variables:
+    AIRFLOW_VERSION: "2.10"
+    PYTHON_VERSION: "3.11"
+    CONFIGURATION_NAME: pain
+    CONFIGURATION_DESC: '"portfolio rebalancing"'
+    PATH_TO_REQUIREMENTS: "requirements.txt"
+    PATH_TO_POETRY: ""
+    APT_GET_LIST: ""
+  when: manual
+
+update image:
+  extends: .mlc_airflow_update_instance
+  stage: deploy
+  variables:
+    AIRFLOW_INSTANCE: pain
+  needs:
+    - build custom image
+  when: manual
+
+publish dags:
+  extends: .mlc_airflow_publish
+  stage: deploy
+  variables:
+    SOURCES_ROOT: .
+    AIRFLOW_INSTANCE: pain
+  needs:
+    - prepare vars
+  when: manual
