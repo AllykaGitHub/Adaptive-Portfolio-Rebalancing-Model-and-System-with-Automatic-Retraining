@@ -2,7 +2,7 @@ job:
   time_limit: 300m
   flavor: 8cpu-128ram
   generate_name: portfolio-rebalancing-job
-  image: docker-hosted.artifactory.tcsbank.ru/mlcpsando/mlcore-self-service/rebalancing:latest
+  image: ##PRIVATE##
   description: "Production portfolio rebalancing pipeline"
   env:
     REBALANCING_PROFILE: "2024_2026"
